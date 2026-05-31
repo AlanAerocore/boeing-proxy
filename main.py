@@ -132,3 +132,12 @@ async def get_boeing_part(
 @app.get("/health")
 async def health():
     return {"status": "ok", "cookies_configured": bool(BOEING_COOKIES_STR)}
+
+
+@app.get("/ip")
+async def get_ip(token: str = Query(...)):
+    if SECRET_TOKEN and token != SECRET_TOKEN:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    async with httpx.AsyncClient(timeout=10) as client:
+        resp = await client.get("https://api.ipify.org?format=json")
+        return resp.json()
